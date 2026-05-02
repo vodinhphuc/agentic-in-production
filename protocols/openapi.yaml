@@ -1,0 +1,188 @@
+openapi: 3.1.0
+info:
+  title: agentic-in-production API
+  version: "1.0.0"
+  description: REST contract between Frontend and Backend. SSE stream for messages.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/healthz:
+    get:
+      summary: Liveness check
+      operationId: healthz
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Healthz' }
+
+  /api/auth/login:
+    post:
+      summary: Log in (single admin in MVP)
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: token issued (also set as HttpOnly cookie)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResponse' }
+        '401':
+          description: Bad credentials
+
+  /api/agents:
+    get:
+      summary: List enabled agents
+      operationId: listAgents
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: list of agents
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Agent' }
+
+  /api/sessions:
+    post:
+      summary: Create a session bound to an agent
+      operationId: createSession
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateSessionRequest' }
+      responses:
+        '201':
+          description: session created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Session' }
+
+  /api/sessions/{id}/messages:
+    get:
+      summary: List messages persisted for a session
+      operationId: listMessages
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: history
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Message' }
+    post:
+      summary: Send a user message and stream agent events
+      operationId: sendMessage
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SendMessageRequest' }
+      responses:
+        '200':
+          description: |
+            Server-Sent Events stream. Each event's `data` field is a JSON object
+            conforming to agent-events.schema.json. Stream ends when a
+            `run_finished` event is delivered.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: see agent-events.schema.json
+
+  /api/sessions/{id}/audit:
+    get:
+      summary: Audit trail of tool calls for a session
+      operationId: getAudit
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: audit entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AuditEntry' }
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: aip_session
+  schemas:
+    Healthz:
+      type: object
+      required: [ok]
+      properties:
+        ok: { type: boolean }
+        version: { type: string }
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string }
+    LoginResponse:
+      type: object
+      required: [token]
+      properties:
+        token: { type: string, description: "JWT; also set as HttpOnly cookie aip_session" }
+    Agent:
+      type: object
+      required: [name, version, enabled]
+      properties:
+        name: { type: string }
+        version: { type: string }
+        description: { type: string }
+        enabled: { type: boolean }
+    CreateSessionRequest:
+      type: object
+      required: [agent_name]
+      properties:
+        agent_name: { type: string }
+    Session:
+      type: object
+      required: [id, agent_name, created_at]
+      properties:
+        id: { type: string }
+        agent_name: { type: string }
+        created_at: { type: string, format: date-time }
+    Message:
+      type: object
+      required: [id, role, text, created_at]
+      properties:
+        id: { type: string }
+        role: { type: string, enum: [user, assistant] }
+        text: { type: string }
+        created_at: { type: string, format: date-time }
+    SendMessageRequest:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string, minLength: 1 }
+    AuditEntry:
+      type: object
+      required: [id, run_id, kind, occurred_at, payload]
+      properties:
+        id: { type: string }
+        run_id: { type: string }
+        kind: { type: string, description: "matches event type from agent-events.schema.json" }
+        occurred_at: { type: string, format: date-time }
+        payload: { type: object, description: "the event JSON" }
