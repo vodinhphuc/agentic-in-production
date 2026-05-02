@@ -1,0 +1,8 @@
+[
+  { "type": "run_started", "run_id": "run_e2" },
+  { "type": "text_delta", "text": "Looking at the orders table." },
+  { "type": "tool_call_start", "call_id": "c1", "tool": "execute_query", "args": { "sql": "SELECT count(*) FROM orders" } },
+  { "type": "tool_call_end", "call_id": "c1", "ok": true, "result_preview": "1 row, 1 column: count=12483" },
+  { "type": "text_delta", "text": " There are 12,483 orders." },
+  { "type": "run_finished", "reason": "done" }
+]

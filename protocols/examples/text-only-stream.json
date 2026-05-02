@@ -1,0 +1,6 @@
+[
+  { "type": "run_started", "run_id": "run_e1" },
+  { "type": "text_delta", "text": "Hello, " },
+  { "type": "text_delta", "text": "world!" },
+  { "type": "run_finished", "reason": "done" }
+]

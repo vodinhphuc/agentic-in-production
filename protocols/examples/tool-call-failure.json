@@ -1,0 +1,10 @@
+[
+  { "type": "run_started", "run_id": "run_e3" },
+  { "type": "tool_call_start", "call_id": "c1", "tool": "execute_query", "args": { "sql": "SELECT * FROM nope" } },
+  { "type": "tool_call_end", "call_id": "c1", "ok": false, "error_message": "Table 'nope' does not exist" },
+  { "type": "text_delta", "text": "That table doesn't exist; let me check the schema." },
+  { "type": "tool_call_start", "call_id": "c2", "tool": "list_tables", "args": {} },
+  { "type": "tool_call_end", "call_id": "c2", "ok": true, "result_preview": "tables: orders, customers, products" },
+  { "type": "text_delta", "text": " I can see orders, customers, products." },
+  { "type": "run_finished", "reason": "done" }
+]

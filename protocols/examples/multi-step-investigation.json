@@ -1,0 +1,14 @@
+[
+  { "type": "run_started", "run_id": "run_e4" },
+  { "type": "text_delta", "text": "Investigating the alert on WIN-WS-014." },
+  { "type": "state_update", "key": "current_table", "value": "detection_finding" },
+  { "type": "tool_call_start", "call_id": "c1", "tool": "describe_table", "args": { "catalog": "ocsf", "schema": "events", "table": "detection_finding" } },
+  { "type": "tool_call_end", "call_id": "c1", "ok": true, "result_preview": "columns: time, class_uid, severity_id, finding_info.title, device.hostname" },
+  { "type": "tool_call_start", "call_id": "c2", "tool": "execute_query", "args": { "sql": "SELECT * FROM ocsf.events.detection_finding WHERE device.hostname = 'WIN-WS-014' AND time > now() - interval '24' hour" } },
+  { "type": "tool_call_end", "call_id": "c2", "ok": true, "result_preview": "1 row: suspicious_powershell_execution at 03:14 UTC" },
+  { "type": "state_update", "key": "current_table", "value": "process_activity" },
+  { "type": "tool_call_start", "call_id": "c3", "tool": "execute_query", "args": { "sql": "SELECT process.cmd_line, process.parent_process.name FROM ocsf.events.process_activity WHERE device.hostname = 'WIN-WS-014' AND time BETWEEN ..." } },
+  { "type": "tool_call_end", "call_id": "c3", "ok": true, "result_preview": "1 row: powershell.exe -EncodedCommand <base64>; parent: explorer.exe" },
+  { "type": "text_delta", "text": "Found the suspicious PowerShell — encoded command launched from explorer.exe at 03:14 UTC. Checking the user's auth history next." },
+  { "type": "run_finished", "reason": "done" }
+]
