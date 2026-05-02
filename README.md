@@ -7,6 +7,8 @@ foundational design spec: [docs/superpowers/specs/2026-05-01-agentic-platform-de
 
 ## Quickstart
 
+First-time setup (toolchains): see [docs/dev-environment.md](docs/dev-environment.md).
+
     cp .env.example .env
     make install
     make hooks
@@ -25,5 +27,6 @@ foundational design spec: [docs/superpowers/specs/2026-05-01-agentic-platform-de
 
 - [CLAUDE.md](CLAUDE.md) — guidance for AI coding agents
 - [docs/dictionary.md](docs/dictionary.md) — shared vocabulary
+- [docs/dev-environment.md](docs/dev-environment.md) — installed tools, versions, rebuild steps
 - [protocols/](protocols/) — wire contracts (frozen, versioned)
 - [docs/adr/](docs/adr/) — architecture decisions
