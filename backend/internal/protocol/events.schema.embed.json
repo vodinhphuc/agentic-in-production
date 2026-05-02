@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-in-production.local/schemas/agent-events.json",
+  "title": "Agent Event",
+  "description": "Canonical event envelope. Every event on the wire (Backend↔Frontend and Adapter↔Backend) is one of these. v1.",
+  "oneOf": [
+    { "$ref": "#/$defs/RunStarted" },
+    { "$ref": "#/$defs/TextDelta" },
+    { "$ref": "#/$defs/ToolCallStart" },
+    { "$ref": "#/$defs/ToolCallEnd" },
+    { "$ref": "#/$defs/StateUpdate" },
+    { "$ref": "#/$defs/Error" },
+    { "$ref": "#/$defs/RunFinished" }
+  ],
+  "$defs": {
+    "RunStarted": {
+      "type": "object",
+      "required": ["type", "run_id"],
+      "properties": {
+        "type":   { "const": "run_started" },
+        "run_id": { "type": "string", "minLength": 1 },
+        "metadata": { "$ref": "#/$defs/Metadata" }
+      },
+      "additionalProperties": false
+    },
+    "TextDelta": {
+      "type": "object",
+      "required": ["type", "text"],
+      "properties": {
+        "type": { "const": "text_delta" },
+        "text": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "ToolCallStart": {
+      "type": "object",
+      "required": ["type", "call_id", "tool"],
+      "properties": {
+        "type":    { "const": "tool_call_start" },
+        "call_id": { "type": "string", "minLength": 1 },
+        "tool":    { "type": "string", "minLength": 1 },
+        "args":    { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "ToolCallEnd": {
+      "type": "object",
+      "required": ["type", "call_id", "ok"],
+      "properties": {
+        "type":           { "const": "tool_call_end" },
+        "call_id":        { "type": "string", "minLength": 1 },
+        "ok":             { "type": "boolean" },
+        "result_preview": { "type": "string" },
+        "error_message":  { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "StateUpdate": {
+      "type": "object",
+      "required": ["type", "key", "value"],
+      "properties": {
+        "type":  { "const": "state_update" },
+        "key":   { "type": "string", "minLength": 1 },
+        "value": {}
+      },
+      "additionalProperties": false
+    },
+    "Error": {
+      "type": "object",
+      "required": ["type", "code", "message"],
+      "properties": {
+        "type":    { "const": "error" },
+        "code":    { "type": "string", "minLength": 1 },
+        "message": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "RunFinished": {
+      "type": "object",
+      "required": ["type", "reason"],
+      "properties": {
+        "type":   { "const": "run_finished" },
+        "reason": { "enum": ["done", "stopped", "error"] }
+      },
+      "additionalProperties": false
+    },
+    "Metadata": {
+      "type": "object",
+      "description": "Opaque pass-through. Platform-specific keys go under metadata.platform; never expose to clients with semantic meaning.",
+      "properties": {
+        "platform": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": true
+    }
+  }
+}

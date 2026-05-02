@@ -8,6 +8,7 @@ Verified on **Ubuntu 24.04 (Noble Numbat)**, including WSL2. macOS and other Lin
 
 | Tool | Version | Purpose | Source of truth |
 |---|---|---|---|
+| **GNU make** | 4.x | Drives `make verify`, `make gen`, `make up`, etc. — the project's standard entry points. | apt |
 | **Python 3** | 3.13+ | JSON Schema validation in `protocols/gen-types.sh`; small dev scripts. | system |
 | `jsonschema` | 4.x | Validates protocol example fixtures and the schema itself. | pip |
 | `pyyaml` | latest | Parses `protocols/openapi.yaml` for sanity checks. | pip |
@@ -27,7 +28,16 @@ Why these specific versions:
 
 These are exactly the commands a fresh machine needs. Each block is independent — run them in order.
 
-### 1. Python + JSON tooling
+### 1. GNU make
+
+Not always pre-installed on minimal Ubuntu / WSL2 images:
+
+```bash
+sudo apt install -y make
+make --version   # expect 4.x
+```
+
+### 2. Python + JSON tooling
 
 Python 3 ships with Ubuntu. Add the two libs:
 
@@ -41,7 +51,7 @@ Verify:
 python3 -c "import jsonschema, yaml; print('ok')"
 ```
 
-### 2. Go 1.22+
+### 3. Go 1.22+ (1.23+ recommended)
 
 ```bash
 sudo apt update
@@ -49,7 +59,9 @@ sudo apt install -y golang-go
 go version   # expect: go1.22.x or newer
 ```
 
-### 3. Node.js 20+ via NodeSource
+Note: `go-jsonschema` v0.18 requires Go ≥ 1.23. With Go 1.22, the `go run` invocation auto-downloads a newer toolchain (Go's `GOTOOLCHAIN=auto` default). That works fine; it just means the first `make gen` after a clean install will pull a second Go version into your module cache.
+
+### 4. Node.js 20+ via NodeSource
 
 Ubuntu's apt-shipped `nodejs` is too old (v18 line). Use NodeSource's repo:
 
@@ -62,7 +74,7 @@ npm --version
 
 What `sudo -E bash -` does: `-E` preserves your env vars across the sudo boundary; the trailing `-` tells bash to read its script from stdin (which is where the piped `curl` output lands).
 
-### 4. pnpm via corepack
+### 5. pnpm via corepack
 
 ```bash
 sudo corepack enable
@@ -70,7 +82,7 @@ corepack prepare pnpm@latest --activate
 pnpm --version
 ```
 
-### 5. Verify the codegen toolchain
+### 6. Verify the codegen toolchain
 
 These probes don't install anything globally — they're the same `npx --yes` and `go run @version` invocations that `protocols/gen-types.sh` uses, so success here means the codegen pipeline will work:
 
@@ -81,7 +93,7 @@ go run github.com/atombender/go-jsonschema@v0.18.0 --help | head -3
 go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.4.1 --help | head -3
 ```
 
-### 6. Optional — only needed for `make verify` and `make dev-backend`
+### 7. Optional — only needed for `make verify` and `make dev-backend`
 
 `golangci-lint` (used by `make lint-backend`):
 
