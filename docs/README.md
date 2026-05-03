@@ -6,6 +6,8 @@ experiments that drove them and the code that implements them.
 ## Foundational reading
 - [design spec](superpowers/specs/2026-05-01-agentic-platform-design.md)
 - [dictionary](dictionary.md) — shared vocabulary
+- [onboarding](onboarding.md) — clone → first green Playwright on a new dev box
+- [dev-environment](dev-environment.md) — toolchain rationale + install
 
 ## Concepts, in the order they were learned
 *(outlines authored at Phase 0 close; prose follows in a retrospective pass)*
