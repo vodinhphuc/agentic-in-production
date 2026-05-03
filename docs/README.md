@@ -8,9 +8,9 @@ experiments that drove them and the code that implements them.
 - [dictionary](dictionary.md) — shared vocabulary
 
 ## Concepts, in the order they were learned
-*(empty until Phase 0 finishes — concept essays are written **after** the experiment ships)*
-1. The agent loop — Phase 0 (TODO)
-2. Streaming protocols — Phase 0 (TODO)
+*(outlines authored at Phase 0 close; prose follows in a retrospective pass)*
+1. [The agent loop](concepts/01-the-agent-loop.md) — Phase 0
+2. [Streaming protocols](concepts/02-streaming-protocols.md) — Phase 0
 
 ## Decisions
 - [ADR-0001 — Three-tier with Go gateway](adr/0001-three-tier-with-go-gateway.md)
