@@ -36,7 +36,7 @@ func (l *Log) List(ctx context.Context, sessionID string) ([]Entry, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var out []Entry
+	out := []Entry{}
 	for rows.Next() {
 		var e Entry
 		if err := rows.Scan(&e.ID, &e.SessionID, &e.RunID, &e.Kind, &e.OccurredAt, &e.Payload); err != nil {

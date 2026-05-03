@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api } from "@/api/client";
 import type { components } from "@/api/types.gen";
 
@@ -8,12 +8,12 @@ export function AuditLogView({ sessionID }: { sessionID: string }) {
   const [rows, setRows] = useState<AuditEntry[]>([]);
   const [err, setErr] = useState<string | null>(null);
 
-  useEffect(() => {
+  const refresh = useCallback(() => {
     let alive = true;
     void api
       .audit(sessionID)
       .then((r) => {
-        if (alive) setRows(r);
+        if (alive) setRows(r ?? []);
       })
       .catch((e) => {
         if (alive) setErr(String(e));
@@ -23,10 +23,12 @@ export function AuditLogView({ sessionID }: { sessionID: string }) {
     };
   }, [sessionID]);
 
+  useEffect(() => refresh(), [refresh]);
+
   if (err) return <div role="alert">Audit error: {err}</div>;
 
   return (
-    <details>
+    <details onToggle={(e) => e.currentTarget.open && refresh()}>
       <summary>Audit log ({rows.length})</summary>
       <table style={{ fontSize: 12, width: "100%" }}>
         <thead>

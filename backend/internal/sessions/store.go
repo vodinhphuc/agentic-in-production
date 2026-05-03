@@ -70,7 +70,7 @@ func (s *Store) ListMessages(ctx context.Context, sessionID string) ([]Message, 
 		return nil, err
 	}
 	defer rows.Close()
-	var out []Message
+	out := []Message{}
 	for rows.Next() {
 		var m Message
 		if err := rows.Scan(&m.ID, &m.Role, &m.Text, &m.CreatedAt); err != nil {

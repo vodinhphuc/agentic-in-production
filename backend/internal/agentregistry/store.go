@@ -28,7 +28,7 @@ func (s *Store) ListEnabled(ctx context.Context) ([]Agent, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var out []Agent
+	out := []Agent{}
 	for rows.Next() {
 		var a Agent
 		if err := rows.Scan(&a.Name, &a.Version, &a.Description, &a.Enabled, &a.AdapterKind, &a.Config); err != nil {
