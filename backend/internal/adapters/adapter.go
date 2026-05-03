@@ -28,7 +28,7 @@ type Session struct {
 type RunRequest struct {
 	RunID          string
 	Session        Session
-	PlatformConvID string   // empty for first message; adapters may create one
+	PlatformConvID string // empty for first message; adapters may create one
 	UserMessage    string
 	ToolAllowlist  []string // backend-enforced; adapter must honor
 }

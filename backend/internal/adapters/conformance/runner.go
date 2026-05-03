@@ -51,7 +51,7 @@ func Run(ctx context.Context, ad adapters.AgentPlatformAdapter, s Scenario) ([]s
 	if err != nil {
 		return nil, fmt.Errorf("start_conv: %w", err)
 	}
-	defer ad.EndConversation(ctx, convID)
+	defer func() { _ = ad.EndConversation(ctx, convID) }()
 
 	ch, err := ad.Run(ctx, adapters.RunRequest{
 		RunID:          "conf_run",
