@@ -1,0 +1,9 @@
+# Triggered by any user message that doesn't match a more specific scenario.
+name: default
+match:
+  any: true
+events:
+  - { type: run_started, run_id: __RUN_ID__ }
+  - { type: text_delta, text: "(mock) I received: " }
+  - { type: text_delta, text: "__USER_MESSAGE__" }
+  - { type: run_finished, reason: done }

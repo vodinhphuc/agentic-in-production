@@ -1,0 +1,15 @@
+# Triggered by messages mentioning "WIN-WS-014" or "powershell" — Phase-0 demo of
+# the multi-step investigation shape that the real Trino agent will produce in Phase 1.
+name: trino-investigation
+match:
+  contains_any: ["WIN-WS-014", "powershell", "investigate"]
+events:
+  - { type: run_started, run_id: __RUN_ID__ }
+  - { type: text_delta, text: "(mock) Investigating the alert on WIN-WS-014." }
+  - { type: state_update, key: current_table, value: detection_finding }
+  - { type: tool_call_start, call_id: c1, tool: describe_table, args: { catalog: ocsf, schema: events, table: detection_finding } }
+  - { type: tool_call_end, call_id: c1, ok: true, result_preview: "columns: time, class_uid, severity_id, finding_info.title, device.hostname" }
+  - { type: tool_call_start, call_id: c2, tool: execute_query, args: { sql: "SELECT * FROM ocsf.events.detection_finding WHERE device.hostname='WIN-WS-014'" } }
+  - { type: tool_call_end, call_id: c2, ok: true, result_preview: "1 row: suspicious_powershell_execution at 03:14 UTC" }
+  - { type: text_delta, text: "Found suspicious PowerShell at 03:14 UTC. (Phase 1 will continue to process_activity, authentication, network_activity.)" }
+  - { type: run_finished, reason: done }
