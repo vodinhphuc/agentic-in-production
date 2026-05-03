@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"bytes"
 	_ "embed"
 	"encoding/json"
 	"fmt"
@@ -21,13 +22,8 @@ var (
 func compileOnce() {
 	once.Do(func() {
 		c := jsonschema.NewCompiler()
-		var v interface{}
-		if err := json.Unmarshal(eventsSchemaBytes, &v); err != nil {
+		if err := c.AddResource("events.schema.json", bytes.NewReader(eventsSchemaBytes)); err != nil {
 			loadErr = fmt.Errorf("embedded schema: %w", err)
-			return
-		}
-		if err := c.AddResource("events.schema.json", v); err != nil {
-			loadErr = err
 			return
 		}
 		s, err := c.Compile("events.schema.json")
