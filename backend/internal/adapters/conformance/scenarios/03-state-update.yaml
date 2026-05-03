@@ -1,0 +1,5 @@
+name: state-update
+input: "investigate WIN-WS-014"
+expect_types_contains:
+  - state_update
+expect_ends_with: run_finished

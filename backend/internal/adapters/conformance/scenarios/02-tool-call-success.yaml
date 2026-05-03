@@ -1,0 +1,7 @@
+name: tool-call-success
+input: "investigate WIN-WS-014"
+expect_types_contains:
+  - tool_call_start
+  - tool_call_end
+expect_starts_with: run_started
+expect_ends_with: run_finished

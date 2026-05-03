@@ -1,0 +1,7 @@
+name: text-only
+input: "hello there"
+expect_types:
+  - run_started
+  - text_delta
+  - run_finished
+expect_min_events: 3
