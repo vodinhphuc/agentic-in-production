@@ -7,9 +7,14 @@ import (
 	"os"
 	"time"
 
+	_ "github.com/phucvd2512/agentic-in-production/backend/internal/adapters/mock" // register kind="mock"
+
+	"github.com/phucvd2512/agentic-in-production/backend/internal/agentregistry"
+	"github.com/phucvd2512/agentic-in-production/backend/internal/audit"
 	"github.com/phucvd2512/agentic-in-production/backend/internal/auth"
 	"github.com/phucvd2512/agentic-in-production/backend/internal/db"
 	"github.com/phucvd2512/agentic-in-production/backend/internal/httpapi"
+	"github.com/phucvd2512/agentic-in-production/backend/internal/sessions"
 )
 
 func main() {
@@ -31,10 +36,19 @@ func main() {
 		time.Hour,
 	)
 
+	deps := httpapi.Deps{
+		Version:  "0.0.0-dev",
+		DB:       d,
+		Auth:     a,
+		Sessions: sessions.NewStore(d),
+		Registry: agentregistry.NewStore(d),
+		Audit:    audit.NewLog(d),
+	}
+
 	port := envOr("BACKEND_PORT", "8080")
 	srv := &http.Server{
 		Addr:              ":" + port,
-		Handler:           httpapi.NewRouter(httpapi.Deps{Version: "0.0.0-dev", DB: d, Auth: a}),
+		Handler:           httpapi.NewRouter(deps),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 	slog.Info("listening", "addr", srv.Addr)

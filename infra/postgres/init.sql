@@ -42,7 +42,9 @@ CREATE TABLE IF NOT EXISTS agent_registry (
     config       jsonb  NOT NULL DEFAULT '{}'  -- per-adapter settings (base_url, api_key_ref, ...)
 );
 
--- Phase 0 seed: one Mock-backed agent
+-- Phase 0 seed: one Mock-backed agent.
+-- scenario_dir is resolved relative to the server's working directory; run from backend/.
 INSERT INTO agent_registry (name, version, description, enabled, adapter_kind, config) VALUES
-    ('mock-trino-flavored', '0.1.0', 'Scripted Trino-flavored conversations for MVP smoke', true, 'mock', '{}')
+    ('mock-trino-flavored', '0.1.0', 'Scripted Trino-flavored conversations for MVP smoke',
+     true, 'mock', '{"scenario_dir":"internal/adapters/mock/scenarios"}')
 ON CONFLICT (name) DO NOTHING;
