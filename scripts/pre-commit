@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Pre-commit: lint + tests + codegen sync. Runs `make verify`.
+set -e
+echo "[pre-commit] make verify"
+make verify
