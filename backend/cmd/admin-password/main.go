@@ -29,19 +29,24 @@ func main() {
 	fmt.Println("OK — ADMIN_PASSWORD_HASH written to", envPath)
 }
 
+// updateEnv writes key='val' (single-quoted) so bcrypt's $-laden hashes survive
+// `set -a; source .env`. docker-compose treats single quotes as literal value
+// delimiters and strips them, so the postgres vars in docker-compose.yml are
+// unaffected.
 func updateEnv(path, key, val string) {
 	b, _ := os.ReadFile(path)
 	lines := strings.Split(string(b), "\n")
+	quoted := key + "='" + val + "'"
 	found := false
 	for i, ln := range lines {
 		if strings.HasPrefix(ln, key+"=") {
-			lines[i] = key + "=" + val
+			lines[i] = quoted
 			found = true
 			break
 		}
 	}
 	if !found {
-		lines = append(lines, key+"="+val)
+		lines = append(lines, quoted)
 	}
 	_ = os.WriteFile(path, []byte(strings.Join(lines, "\n")), 0644)
 }
